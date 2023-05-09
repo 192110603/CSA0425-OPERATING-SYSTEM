@@ -1,0 +1,81 @@
+#include<stdio.h>
+#define MAX 100
+
+int main() {
+    int frames[MAX], pages[MAX];
+    int i, j, k, page_faults = 0, n, f;
+    int flag[MAX], max, replace, counter = 0;
+    printf("Enter the number of page frames: ");
+    scanf("%d",&f);
+    printf("Enter the number of pages: ");
+    scanf("%d",&n);
+    printf("Enter the page reference sequence: ");
+    for(i=0;i<n;i++) {
+        scanf("%d",&pages[i]);
+        flag[i] = 0;
+    }
+    for(i=0;i<f;i++) {
+        frames[i] = -1;
+    }
+    for(i=0;i<n;i++) {
+        printf("%d:\t",pages[i]);
+        flag[pages[i]] = 1;
+        if(counter < f) {
+            frames[counter] = pages[i];
+            counter++;
+            page_faults++;
+            for(j=0;j<f;j++) {
+                printf("%d\t",frames[j]);
+            }
+            printf("Page Fault\n");
+            continue;
+        }
+        for(j=0;j<f;j++) {
+            if(frames[j] == pages[i]) {
+                flag[pages[i]] = 0;
+                break;
+            }
+        }
+        if(j == f) {
+            for(j=0;j<f;j++) {
+                if(flag[frames[j]] == 0) {
+                    frames[j] = pages[i];
+                    page_faults++;
+                    flag[pages[i]] = 0;
+                    for(k=0;k<f;k++) {
+                        printf("%d\t",frames[k]);
+                    }
+                    printf("Page Fault\n");
+                    break;
+                }
+            }
+            if(j == f) {
+                max = -1;
+                for(j=0;j<f;j++) {
+                    for(k=i+1;k<n;k++) {
+                        if(frames[j] == pages[k]) {
+                            if(k > max) {
+                                max = k;
+                                replace = j;
+                            }
+                            break;
+                        }
+                    }
+                    if(k == n) {
+                        replace = j;
+                        break;
+                    }
+                }
+                frames[replace] = pages[i];
+                page_faults++;
+                flag[pages[i]] = 0;
+                for(j=0;j<f;j++) {
+                    printf("%d\t",frames[j]);
+                }
+                printf("Page Fault\n");
+            }
+        }
+    }
+    printf("Total Page Faults: %d\n",page_faults);
+    return 0;
+}
