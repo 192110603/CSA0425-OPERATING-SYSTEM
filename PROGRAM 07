@@ -1,0 +1,65 @@
+#include<stdio.h>
+#define MAX 100
+
+int main() {
+    int frames, pages, page_faults = 0;
+    int page_sequence[MAX], page_table[MAX];
+
+    printf("Enter the number of page frames: ");
+    scanf("%d", &frames);
+
+    printf("Enter the number of pages: ");
+    scanf("%d", &pages);
+
+    printf("Enter the page reference sequence: ");
+    for (int i = 0; i < pages; i++) {
+        scanf("%d", &page_sequence[i]);
+    }
+
+    // initialize page table with -1
+    for (int i = 0; i < frames; i++) {
+        page_table[i] = -1;
+    }
+
+    int index = 0;
+    for (int i = 0; i < pages; i++) {
+        int page = page_sequence[i];
+        int found = 0;
+        // check if page is already in page table
+        for (int j = 0; j < frames; j++) {
+            if (page_table[j] == page) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            page_faults++;
+            // find the least recently used page
+            int lru = MAX;
+            for (int j = 0; j < frames; j++) {
+                int k;
+                for (k = i-1; k >= 0; k--) {
+                    if (page_table[j] == page_sequence[k]) {
+                        break;
+                    }
+                }
+                if (k < lru) {
+                    lru = k;
+                    index = j;
+                }
+            }
+            // replace the least recently used page with current page
+            page_table[index] = page;
+        }
+        // print page table after each page reference
+        printf("Page table after reference to page %d: ", page);
+        for (int j = 0; j < frames; j++) {
+            printf("%d ", page_table[j]);
+        }
+        printf("\n");
+    }
+
+    printf("Total number of page faults: %d\n", page_faults);
+
+    return 0;
+}
